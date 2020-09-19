@@ -31,15 +31,19 @@ async def on_member_join(member):
 # Event triggered when a message is sent to a discord server that the bot is in
 @client.event
 async def on_message(message):
-    # print message architecture to see what tf is there.
-    print("Message author: " + message.author.name)
-    print("Message author guild: " + message.author.guild.name)
-    print("Message content: " + message.content)
-    print("Message channel: " + message.channel.name)
-    if message.content == str(PREFIX) + "Hi":
-        print("Fack you")
-    elif message.content == str(PREFIX) + "BooBs":
-        print("NICE")
+    # Check to see if the user for the command is the same as the bot (Not responding to a response)
+    if message.author == client.user:
+        return
+
+    # Check to see if the prefix is valid at the beginning of the message
+    if message.content[0] != PREFIX or message.content == "~":
+        return
+
+    # Get the command that was passed to the bot
+    command = message.content[1:].split(" ")[0].lower()
+
+    # At this point the command is in lower case, just needs to be handled accordingly
+    print(command)
 
 # Finally, run the bot
 client.run(TOKEN)
