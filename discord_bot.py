@@ -38,6 +38,8 @@ async def on_message(message):
     print("Message channel: " + message.channel.name)
     if message.content == str(PREFIX) + "Hi":
         print("Fack you")
+    elif message.content == str(PREFIX) + "BooBs":
+        print("NICE")
 
 # Finally, run the bot
 client.run(TOKEN)
