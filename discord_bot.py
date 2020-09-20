@@ -2,9 +2,12 @@
 
 # Import block for getting libraries
 import os
+import random
 import discord
+from discord.ext import commands
 import logging
 from dotenv import load_dotenv
+import modules.toolkit as toolkit
 
 # Get the environment variables like the keys
 load_dotenv()
@@ -13,7 +16,8 @@ PREFIX = os.getenv('DISCORD_PREFIX')
 
 # Set up work environment
 logging.basicConfig(level=logging.INFO)
-client = discord.Client()
+client = commands.Bot(command_prefix=PREFIX)
+
 
 # Event triggered when the bot has completed setup and is now ready to perform tasks
 @client.event
@@ -22,28 +26,43 @@ async def on_ready():
     for guild in client.guilds:
         print("Guild name is: " + guild.name + " with an id of: " + str(guild.id))
 
+
 # Event triggered when members join a discord server (guild)
 @client.event
 async def on_member_join(member):
     await member.createdm()
-    await member.dm_channel.send("Word is on the street that you like to go by 'last place larry'")
+    # await member.dm_channel.send("Word is on the street that you like to go by 'last place larry'")
 
-# Event triggered when a message is sent to a discord server that the bot is in
-@client.event
-async def on_message(message):
-    # Check to see if the user for the command is the same as the bot (Not responding to a response)
-    if message.author == client.user:
-        return
+# Base command
+@client.command()
+async def ping(ctx):
+    await ctx.send(f'pong! {round(client.latency * 1000)} ms')
 
-    # Check to see if the prefix is valid at the beginning of the message
-    if message.content[0] != PREFIX or message.content == "~":
-        return
 
-    # Get the command that was passed to the bot
-    command = message.content[1:].split(" ")[0].lower()
+@client.command(aliases=['8ball'])
+async def _8ball(ctx, *, question):
+    responses = ["It is certain",
+                 "It is decidedly so",
+                 "Without a doubt",
+                 "Yes, definitely",
+                 "You may rely on it",
+                 "As I see it, yes",
+                 "Most Likely",
+                 "Outlook Good",
+                 "Yes",
+                 "Signs point to yes",
+                 "Reply hazy, try again",
+                 "Ask again later",
+                 "Better not tell you now",
+                 "Cannot predict now",
+                 "Concentrate and ask again",
+                 "Don't count on it",
+                 "My reply is no",
+                 "My sources say no",
+                 "Outlook not so good",
+                 "Very Doubtful"]
+    await ctx.send(f'Question: {question}\nAnswer: {random.choice(responses)}')
 
-    # At this point the command is in lower case, just needs to be handled accordingly
-    print(command)
 
 # Finally, run the bot
 client.run(TOKEN)
