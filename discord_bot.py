@@ -33,6 +33,8 @@ async def on_member_join(member):
     await member.createdm()
     # await member.dm_channel.send("Word is on the street that you like to go by 'last place larry'")
 
+# ##################### Client Commands ##################################
+
 # Base command
 @client.command()
 async def ping(ctx):
@@ -62,6 +64,42 @@ async def _8ball(ctx, *, question):
                  "Outlook not so good",
                  "Very Doubtful"]
     await ctx.send(f'Question: {question}\nAnswer: {random.choice(responses)}')
+
+
+@client.command()
+async def clear(ctx, amount=5):
+    # TODO: check to see if user has permissions to remove messages
+    await ctx.channel.purge(limit=amount)
+
+
+@client.command()
+async def kick(ctx, member: discord.Member, *, reason=None):
+    try:
+        await member.kick(reason=reason)
+    except discord.ext.commands.errors.BadArgument:
+        ctx.send("User not found")
+
+
+@client.command()
+async def ban(ctx, member: discord.Member, *, reason=None):
+    try:
+        await member.ban(reason=reason)
+        await ctx.send(f'Banned {user.mention}')
+    except discord.ext.commands.errors.BadArgument:
+        ctx.send("User not found")
+
+
+@client.command()
+async def unban(ctx, *, member):
+    banned_users = await ctx.guild.bans()
+    member_name, member_discriminator = member.split('#')
+
+    for ban_entry in banned_users:
+        user = ban_entry.user
+        if (user.name, user.discriminator) == (member_name, member_discriminator):
+            await ctx.guild.unban(user)
+            await ctx.send(f'Unbanned {user.mention}')
+            return
 
 
 # Finally, run the bot
