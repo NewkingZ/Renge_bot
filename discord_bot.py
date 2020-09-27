@@ -2,12 +2,10 @@
 
 # Import block for getting libraries
 import os
-import random
 import discord
 from discord.ext import commands
 import logging
 from dotenv import load_dotenv
-import modules.toolkit as toolkit
 
 # Get the environment variables like the keys
 load_dotenv()
@@ -30,77 +28,24 @@ async def on_ready():
 # Event triggered when members join a discord server (guild)
 @client.event
 async def on_member_join(member):
-    await member.createdm()
+    print("Member has joined, nothing enabled currently")
+    # await member.createdm()
     # await member.dm_channel.send("Word is on the street that you like to go by 'last place larry'")
 
 # ##################### Client Commands ##################################
-
-# Base command
 @client.command()
-async def ping(ctx):
-    await ctx.send(f'pong! {round(client.latency * 1000)} ms')
-
-
-@client.command(aliases=['8ball'])
-async def _8ball(ctx, *, question):
-    responses = ["It is certain",
-                 "It is decidedly so",
-                 "Without a doubt",
-                 "Yes, definitely",
-                 "You may rely on it",
-                 "As I see it, yes",
-                 "Most Likely",
-                 "Outlook Good",
-                 "Yes",
-                 "Signs point to yes",
-                 "Reply hazy, try again",
-                 "Ask again later",
-                 "Better not tell you now",
-                 "Cannot predict now",
-                 "Concentrate and ask again",
-                 "Don't count on it",
-                 "My reply is no",
-                 "My sources say no",
-                 "Outlook not so good",
-                 "Very Doubtful"]
-    await ctx.send(f'Question: {question}\nAnswer: {random.choice(responses)}')
+async def load(ctx, extension):
+    client.load_extension(f'cogs.{extension}')
 
 
 @client.command()
-async def clear(ctx, amount=5):
-    # TODO: check to see if user has permissions to remove messages
-    await ctx.channel.purge(limit=amount)
+async def unload(ctx, extension):
+    client.unload_extension(f'cogs.{extension}')
 
 
-@client.command()
-async def kick(ctx, member: discord.Member, *, reason=None):
-    try:
-        await member.kick(reason=reason)
-    except discord.ext.commands.errors.BadArgument:
-        ctx.send("User not found")
-
-
-@client.command()
-async def ban(ctx, member: discord.Member, *, reason=None):
-    try:
-        await member.ban(reason=reason)
-        await ctx.send(f'Banned {user.mention}')
-    except discord.ext.commands.errors.BadArgument:
-        ctx.send("User not found")
-
-
-@client.command()
-async def unban(ctx, *, member):
-    banned_users = await ctx.guild.bans()
-    member_name, member_discriminator = member.split('#')
-
-    for ban_entry in banned_users:
-        user = ban_entry.user
-        if (user.name, user.discriminator) == (member_name, member_discriminator):
-            await ctx.guild.unban(user)
-            await ctx.send(f'Unbanned {user.mention}')
-            return
-
+for filename in os.listdir("./cogs"):
+    if filename.endswith(".py"):
+        client.load_extension(f'cogs.{filename[:-3]}')
 
 # Finally, run the bot
 client.run(TOKEN)
