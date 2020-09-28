@@ -44,8 +44,12 @@ async def on_command_error(ctx, error):
         await ctx.send('Please pass in required arguments')
     elif isinstance(error, commands.CommandNotFound):
         await ctx.send('Invalid command')
+    elif isinstance(error, commands.MissingPermissions):
+        await ctx.send('Missing permissions')
     else:
-        print("Unhandled error: " + error)
+        print("Unhandled error")
+        print("Message: " + ctx.message.content)
+        print("Author: " + ctx.message.author.name)
 
 # ##################### Client Commands ##################################
 @client.command()

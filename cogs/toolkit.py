@@ -18,6 +18,7 @@ class Toolkit(commands.Cog):
         await ctx.send(f'pong! {round(self.client.latency * 1000)} ms')
 
     @commands.command()
+    @commands.has_permissions(manage_messages=True)
     async def clear(self, ctx, amount: int):
         # TODO: check to see if user has permissions to remove messages
         await ctx.channel.purge(limit=amount)
