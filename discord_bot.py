@@ -37,6 +37,16 @@ async def on_member_join(member):
     # await member.createdm()
     # await member.dm_channel.send("Word is on the street that you like to go by 'last place larry'")
 
+
+@client.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send('Please pass in required arguments')
+    elif isinstance(error, commands.CommandNotFound):
+        await ctx.send('Invalid command')
+    else:
+        print("Unhandled error: " + error)
+
 # ##################### Client Commands ##################################
 @client.command()
 async def load(ctx, extension):
@@ -53,9 +63,9 @@ async def change_status():
     await client.change_presence(activity=discord.Game(next(status)))
 
 
+# Load cogs and then start the client
 for filename in os.listdir("./cogs"):
     if filename.endswith(".py"):
         client.load_extension(f'cogs.{filename[:-3]}')
 
-# Finally, run the bot
 client.run(TOKEN)

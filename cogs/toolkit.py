@@ -18,7 +18,7 @@ class Toolkit(commands.Cog):
         await ctx.send(f'pong! {round(self.client.latency * 1000)} ms')
 
     @commands.command()
-    async def clear(self, ctx, amount=5):
+    async def clear(self, ctx, amount: int):
         # TODO: check to see if user has permissions to remove messages
         await ctx.channel.purge(limit=amount)
 
@@ -49,6 +49,11 @@ class Toolkit(commands.Cog):
                 await ctx.guild.unban(user)
                 await ctx.send(f'Unbanned {user.mention}')
                 return
+
+    @clear.error
+    async def clear_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("Error with the clear command")
 
 
 def setup(client):
