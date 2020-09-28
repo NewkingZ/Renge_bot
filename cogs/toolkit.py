@@ -23,6 +23,7 @@ class Toolkit(commands.Cog):
         # TODO: check to see if user has permissions to remove messages
         await ctx.channel.purge(limit=amount)
 
+    @commands.has_permissions(kick_members=True)
     @commands.command()
     async def kick(self, ctx, member: discord.Member, *, reason=None):
         try:
@@ -31,6 +32,7 @@ class Toolkit(commands.Cog):
         except discord.ext.commands.errors.BadArgument:
             ctx.send("User not found")
 
+    @commands.has_permissions(ban_members=True)
     @commands.command()
     async def ban(self, ctx, member: discord.Member, *, reason=None):
         try:
@@ -39,6 +41,7 @@ class Toolkit(commands.Cog):
         except discord.ext.commands.errors.BadArgument:
             ctx.send("User not found")
 
+    @commands.has_permissions(ban_members=True)
     @commands.command()
     async def unban(self, ctx, *, member):
         banned_users = await ctx.guild.bans()
