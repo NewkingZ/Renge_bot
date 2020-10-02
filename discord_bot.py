@@ -20,9 +20,8 @@ client = commands.Bot(command_prefix=PREFIX)
 status = cycle(['Nyanpasu!', 'Killin it'])
 
 
-# Event triggered when the bot has completed setup and is now ready to perform tasks
-@client.event
-async def on_ready():
+async def ready():
+    await client.wait_until_ready()
     await client.change_presence(status=discord.Status.online, activity=discord.Game('Nyanpasu!'))
     print(f'{client.user} has connected to Discord!')
     for guild in client.guilds:
@@ -71,5 +70,7 @@ async def unload(ctx, extension):
 for filename in os.listdir("./cogs"):
     if filename.endswith(".py"):
         client.load_extension(f'cogs.{filename[:-3]}')
+
+client.loop.create_task(ready())
 
 client.run(TOKEN)

@@ -10,9 +10,10 @@ players = {}
 class Music(commands.Cog):
     def __init__(self, client):
         self.client = client
+        self.client.loop.create_task(self.ready())
 
-    @commands.Cog.listener()
-    async def on_ready(self):
+    async def ready(self):
+        await self.client.wait_until_ready()
         print('Music module is ready')
 
     @commands.command()
