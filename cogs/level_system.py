@@ -4,7 +4,7 @@ from discord.ext import commands
 
 
 class Levels(commands.Cog):
-    def __init(self, client):
+    def __init__(self, client):
         self.client = client
         self.client.loop.create_task(self.ready())
 
