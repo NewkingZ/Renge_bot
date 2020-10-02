@@ -8,7 +8,7 @@ players = {}
 
 
 class Music(commands.Cog):
-    def __init(self, client):
+    def __init__(self, client):
         self.client = client
 
     @commands.Cog.listener()
@@ -17,22 +17,22 @@ class Music(commands.Cog):
 
     @commands.command()
     async def leave(self, ctx):
-        server = ctx.message.server
-        voice_client = self.client.voice_client_in(server)
-        await voice_client.disconnect()
+        if ctx.voice_client is not None:
+            await ctx.voice_client.disconnect()
 
     @commands.command()
-    async def join(self, ctx):
-        channel = ctx.message.author.voice.voice_channel
-        await self.client.join_voice_channel(channel)
+    async def join(self, ctx: commands.Context):
+        destination = ctx.author.voice.channel
 
-    @commands.command()
-    async def play(self, ctx, url):
-        server = ctx.message.server
-        voice_client = self.client.voice_client_in(server)
-        player = await voice_client.create_ytdl_player(url)
-        players[server.id] = player
-        player.start()
+        if ctx.voice_client is not None:
+            await ctx.voice_client.voice.move_to(destination)
+            return
+        ctx.voice_client.voice = await destination.connect()
+
+    @commands.command(aliases=['play'])
+    async def _play(self, ctx: commands.Context):
+        vc = ctx.voice_client
+        vc.play(discord.FFmpegPCMAudio('Play_this_daily.m4a'), after=lambda e: print('done', e))
 
 
 def setup(client):

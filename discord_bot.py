@@ -27,7 +27,7 @@ async def on_ready():
     print(f'{client.user} has connected to Discord!')
     for guild in client.guilds:
         print("Guild name is: " + guild.name + " with an id of: " + str(guild.id))
-    change_status.start()
+    #change_status.start()
 
 
 # Event triggered when members join a discord server (guild)
@@ -38,18 +38,18 @@ async def on_member_join(member):
     # await member.dm_channel.send("Word is on the street that you like to go by 'last place larry'")
 
 
-@client.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send('Please pass in required arguments')
-    elif isinstance(error, commands.CommandNotFound):
-        await ctx.send('Invalid command')
-    elif isinstance(error, commands.MissingPermissions):
-        await ctx.send('Missing permissions')
-    else:
-        print("Unhandled error")
-        print("Message: " + ctx.message.content)
-        print("Author: " + ctx.message.author.name)
+# @client.event
+# async def on_command_error(ctx, error):
+#     if isinstance(error, commands.MissingRequiredArgument):
+#         await ctx.send('Please pass in required arguments')
+#     elif isinstance(error, commands.CommandNotFound):
+#         await ctx.send('Invalid command')
+#     elif isinstance(error, commands.MissingPermissions):
+#         await ctx.send('Missing permissions')
+#     else:
+#         print("Unhandled error")
+#         print("Message: " + ctx.message.content)
+#         print("Author: " + ctx.message.author.name)
 
 # ##################### Client Commands ##################################
 @client.command()
@@ -62,9 +62,9 @@ async def unload(ctx, extension):
     client.unload_extension(f'cogs.{extension}')
 
 
-@tasks.loop(seconds=10)
-async def change_status():
-    await client.change_presence(activity=discord.Game(next(status)))
+# @tasks.loop(seconds=10)
+# async def change_status():
+#     await client.change_presence(activity=discord.Game(next(status)))
 
 
 # Load cogs and then start the client
