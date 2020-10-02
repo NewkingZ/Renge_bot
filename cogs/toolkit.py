@@ -6,10 +6,10 @@ class Toolkit(commands.Cog):
     
     def __init__(self, client):
         self.client = client
+        self.client.loop.create_task(self.ready())
 
-    # Events
-    @commands.Cog.listener()
-    async def on_ready(self):
+    async def ready(self):
+        await self.client.wait_until_ready()
         print('Toolkit Cog is ready')
 
     # Commands

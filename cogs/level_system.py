@@ -6,9 +6,10 @@ from discord.ext import commands
 class Levels(commands.Cog):
     def __init(self, client):
         self.client = client
+        self.client.loop.create_task(self.ready())
 
-    @commands.Cog.listener()
-    async def on_ready(self):
+    async def ready(self):
+        await self.client.wait_until_ready()
         print('Level system module is ready')
         # Needs to be implemented
 
