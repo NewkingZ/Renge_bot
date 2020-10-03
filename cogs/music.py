@@ -35,6 +35,11 @@ class Music(commands.Cog):
         vc = ctx.voice_client
         vc.play(discord.FFmpegPCMAudio('Play_this_daily.m4a'), after=lambda e: print('done', e))
 
+    @commands.command(aliases=['brag'])
+    async def _megan(self, ctx: commands.Context):
+        vc = ctx.voice_client
+        vc.play(discord.FFmpegPCMAudio('Play_this_daily.m4a'), after=lambda e: print('done', e))
+
 
 def setup(client):
     client.add_cog(Music(client))
