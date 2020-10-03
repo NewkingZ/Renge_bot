@@ -9,7 +9,22 @@ import json
 LEAGUE_HEADER = "https://na1.api.riotgames.com/lol/"
 
 LEAGUE_COMMANDS = {"get_summoner": "summoner/v4/summoners/by-name/",
-                   "get_most_played": "champion-mastery/v4/champion-masteries/by-summoner/"}
+                   "get_most_played": "champion-mastery/v4/champion-masteries/by-summoner/",
+                   "get_rank": "league/v4/entries/by-summoner/"}
+
+LEAGUE_RANK_TYPES = {"RANKED_FLEX_SR" : "Ranked Flex",
+                     "RANKED_SOLO_5x5" : "Ranked Solo"}
+
+LEAGUE_RANKS = { "IRON" : "Iron",
+                 "BRONZE": "Bronze",
+                 "SILVER" : "Silver",
+                 "GOLD" : "Gold",
+                 "PLATINUM" : "Platinum",
+                 "DIAMOND" : "Diamond",
+                 "MASTER" : "Master",
+                 "GRANDMASTER" : "Grandmaster",
+                 "CHALLENGER" : "Challenger",
+}
 
 # Maximum # of commands for bot is 20 requests / second, 100 / 2 minutes
 load_dotenv()
@@ -29,7 +44,7 @@ class League(commands.Cog):
 
     @commands.command()
     async def summoner(self, ctx, *, user):
-        _url = LEAGUE_HEADER + LEAGUE_COMMANDS["get_summoner_by_name"] + user
+        _url = LEAGUE_HEADER + LEAGUE_COMMANDS["get_summoner"] + user
         headers = {
             "Origin": "https://developer.riotgames.com",
             "X-Riot-Token": LEAGUE_KEY
@@ -66,7 +81,36 @@ class League(commands.Cog):
         results = f'Summoner {user}\'s most played are:\n'
 
         for i in range(5):
-            results = results + f'\t{CHAMPIONS[str(content[i]["championId"])]} with {content[i]["championPoints"]}\n'
+            results = results + f'\t{CHAMPIONS[str(content[i]["championId"])]} ' \
+                                f'with {content[i]["championPoints"]:,} pts. level {content[i]["championLevel"]}\n'
+        await ctx.send(results)
+
+    @commands.command()
+    async def getRank(self, ctx, *, user):
+        _url = LEAGUE_HEADER + LEAGUE_COMMANDS["get_summoner"] + user
+        headers = {
+            "Origin": "https://developer.riotgames.com",
+            "X-Riot-Token": LEAGUE_KEY
+        }
+        response = requests.get(_url, headers=headers)
+        if response.status_code != 200:
+            await ctx.send(f'Unsuccessful request referencing summoner ID. Code: {response.status_code}')
+            return
+
+        content = json.loads(response.content.decode())
+        _url = LEAGUE_HEADER + LEAGUE_COMMANDS["get_rank"] + content["id"]
+        response = requests.get(_url, headers=headers)
+
+        if response.status_code != 200:
+            await ctx.send(f'Unsuccessful request referencing summoner ID. Code: {response.status_code}')
+            return
+
+        content = json.loads(response.content.decode())
+        results = f'Summoner {user}\'s ranks are:\n'
+        for rank in content:
+            results = results + f'\t{LEAGUE_RANK_TYPES[rank["queueType"]]}: {LEAGUE_RANKS[rank["tier"]]}' \
+                                f' {rank["rank"]} with {rank["leaguePoints"]} pts.' \
+                                f'\t\t\tW/L = {rank["wins"]}/{rank["losses"]}\n'
         await ctx.send(results)
 
 
