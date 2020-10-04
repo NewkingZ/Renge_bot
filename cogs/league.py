@@ -16,15 +16,15 @@ LEAGUE_COMMANDS = {"get_summoner": "summoner/v4/summoners/by-name/",
 LEAGUE_RANK_TYPES = {"RANKED_FLEX_SR" : "Ranked Flex",
                      "RANKED_SOLO_5x5" : "Ranked Solo",}
 
-LEAGUE_RANKS = { "IRON" : "Iron",
+LEAGUE_RANKS = { "IRON": "Iron",
                  "BRONZE": "Bronze",
-                 "SILVER" : "Silver",
-                 "GOLD" : "Gold",
-                 "PLATINUM" : "Platinum",
-                 "DIAMOND" : "Diamond",
-                 "MASTER" : "Master",
-                 "GRANDMASTER" : "Grandmaster",
-                 "CHALLENGER" : "Challenger",
+                 "SILVER": "Silver",
+                 "GOLD": "Gold",
+                 "PLATINUM": "Platinum",
+                 "DIAMOND": "Diamond",
+                 "MASTER": "Master",
+                 "GRANDMASTER": "Grandmaster",
+                 "CHALLENGER": "Challenger",
 }
 
 # Maximum # of commands for bot is 20 requests / second, 100 / 2 minutes
@@ -32,6 +32,7 @@ load_dotenv()
 LEAGUE_KEY = os.getenv('RIOT_KEY')
 
 CHAMPIONS = None
+
 
 class League(commands.Cog):
     def __init__(self, client):
@@ -43,7 +44,7 @@ class League(commands.Cog):
         print('League module is ready')
 
     @commands.command()
-    async def summoner(self, ctx, *, user):
+    async def lolSummoner(self, ctx, *, user):
         _url = LEAGUE_HEADER + LEAGUE_COMMANDS["get_summoner"] + user
         headers = {
             "Origin": "https://developer.riotgames.com",
@@ -58,7 +59,7 @@ class League(commands.Cog):
             await ctx.send(f'{user} is level {content["summonerLevel"]}. Encrypted ID: {content["id"]}')
 
     @commands.command()
-    async def mostPlayed(self, ctx, *, user):
+    async def lolMastery(self, ctx, *, user):
         _url = LEAGUE_HEADER + LEAGUE_COMMANDS["get_summoner"] + user
         headers = {
             "Origin": "https://developer.riotgames.com",
@@ -86,7 +87,7 @@ class League(commands.Cog):
         await ctx.send(results)
 
     @commands.command()
-    async def getRank(self, ctx, *, user):
+    async def lolRank(self, ctx, *, user):
         _url = LEAGUE_HEADER + LEAGUE_COMMANDS["get_summoner"] + user
         headers = {
             "Origin": "https://developer.riotgames.com",
@@ -116,7 +117,7 @@ class League(commands.Cog):
         await ctx.send(results)
 
     @commands.command()
-    async def activeGame(self, ctx, *, user):
+    async def lolLive(self, ctx, *, user):
         _url = LEAGUE_HEADER + LEAGUE_COMMANDS["get_summoner"] + user
         headers = {
             "Origin": "https://developer.riotgames.com",
@@ -124,7 +125,7 @@ class League(commands.Cog):
         }
         response = requests.get(_url, headers=headers)
         if response.status_code != 200:
-            await ctx.send(f'Unsuccessful request referencing summoner ID. Code: {response.status_code}')
+            await ctx.send(f'Unsuccessful request referencing summoner ID [Code: {response.status_code}]')
             return
 
         content = json.loads(response.content.decode())
@@ -134,34 +135,34 @@ class League(commands.Cog):
         if response.status_code != 200:
             print(_url)
             print(headers)
-            await ctx.send(f'Unsuccessful request getting active game. Code: {response.status_code}')
+            print("return code: " + response.status_code)
+            await ctx.send(f'Couldn\'t get active game. Are you sure they\'re in a game?')
             return
 
-        # General informations
+        # General information
         content = json.loads(response.content.decode())
         results = f'Summoner {user}\'s game information:\n' \
                   f'Game type: {content["gameMode"]}\n' \
-                  f'Duration: {(content["gameLength"] + 180)%60} minutes, seconds\n' \
-                  f'Banned Champions: '
+                  f'Duration: {round((content["gameLength"] + 180)/60)} minutes,' \
+                  f' {(content["gameLength"] + 180)%60} seconds\n'
 
         # Banned Champions
         if "bannedChampions" in content:
+            results = results + f'Banned Champions: '
             for champion in content["bannedChampions"]:
                 results = results + CHAMPIONS[str(champion["championId"])] + ", "
 
             results = results[:-2]
 
-        results = results + "\n\nTeam Blue\n"
-
         # Add participant information
         # Team blue
+        results = results + "\n\nTeam Blue\n"
         for participant in content["participants"][len(content["participants"])//2:]:
             results = results + f'[{participant["summonerName"]}]   {CHAMPIONS[str(participant["championId"])]}\n'
 
-        results = results + "\nTeam Red\n"
-
         # Add participant information
         # Team red
+        results = results + "\nTeam Red\n"
         for participant in content["participants"][:len(content["participants"])//2]:
             results = results + f'[{participant["summonerName"]}]   {CHAMPIONS[str(participant["championId"])]}\n'
 
