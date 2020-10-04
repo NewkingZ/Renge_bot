@@ -163,7 +163,7 @@ class League(commands.Cog):
         # Add participant information
         # Team red
         for participant in content["participants"][:len(content["participants"])//2]:
-            results = results + f'participant: {participant["summonerName"]}\n'
+            results = results + f'[{participant["summonerName"]}]   {CHAMPIONS[str(participant["championId"])]}\n'
 
         await ctx.send(results)
 
