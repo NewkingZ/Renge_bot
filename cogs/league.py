@@ -10,10 +10,11 @@ LEAGUE_HEADER = "https://na1.api.riotgames.com/lol/"
 
 LEAGUE_COMMANDS = {"get_summoner": "summoner/v4/summoners/by-name/",
                    "get_most_played": "champion-mastery/v4/champion-masteries/by-summoner/",
-                   "get_rank": "league/v4/entries/by-summoner/"}
+                   "get_rank": "league/v4/entries/by-summoner/",
+                   "get_active_game": "spectator/v4/active-games/by-summoner/"}
 
 LEAGUE_RANK_TYPES = {"RANKED_FLEX_SR" : "Ranked Flex",
-                     "RANKED_SOLO_5x5" : "Ranked Solo"}
+                     "RANKED_SOLO_5x5" : "Ranked Solo",}
 
 LEAGUE_RANKS = { "IRON" : "Iron",
                  "BRONZE": "Bronze",
@@ -31,7 +32,6 @@ load_dotenv()
 LEAGUE_KEY = os.getenv('RIOT_KEY')
 
 CHAMPIONS = None
-
 
 class League(commands.Cog):
     def __init__(self, client):
@@ -102,7 +102,7 @@ class League(commands.Cog):
         response = requests.get(_url, headers=headers)
 
         if response.status_code != 200:
-            await ctx.send(f'Unsuccessful request referencing summoner ID. Code: {response.status_code}')
+            await ctx.send(f'Unsuccessful request getting summoner ranks. Code: {response.status_code}')
             return
 
         content = json.loads(response.content.decode())
@@ -111,6 +111,60 @@ class League(commands.Cog):
             results = results + f'\t{LEAGUE_RANK_TYPES[rank["queueType"]]}: {LEAGUE_RANKS[rank["tier"]]}' \
                                 f' {rank["rank"]} with {rank["leaguePoints"]} pts.' \
                                 f'\t\t\tW/L = {rank["wins"]}/{rank["losses"]}\n'
+            if "miniSeries" in rank:
+                results = results + f'\t\t\tMini-series: {rank["miniSeries"]["wins"]}-{rank["miniSeries"]["losses"]}\n'
+        await ctx.send(results)
+
+    @commands.command()
+    async def activeGame(self, ctx, *, user):
+        _url = LEAGUE_HEADER + LEAGUE_COMMANDS["get_summoner"] + user
+        headers = {
+            "Origin": "https://developer.riotgames.com",
+            "X-Riot-Token": LEAGUE_KEY
+        }
+        response = requests.get(_url, headers=headers)
+        if response.status_code != 200:
+            await ctx.send(f'Unsuccessful request referencing summoner ID. Code: {response.status_code}')
+            return
+
+        content = json.loads(response.content.decode())
+        _url = LEAGUE_HEADER + LEAGUE_COMMANDS["get_active_game"] + content["id"]
+        response = requests.get(_url, headers=headers)
+
+        if response.status_code != 200:
+            print(_url)
+            print(headers)
+            await ctx.send(f'Unsuccessful request getting active game. Code: {response.status_code}')
+            return
+
+        # General informations
+        content = json.loads(response.content.decode())
+        results = f'Summoner {user}\'s game information:\n' \
+                  f'Game type: {content["gameMode"]}\n' \
+                  f'Duration: {(content["gameLength"] + 180)%60} minutes, seconds\n' \
+                  f'Banned Champions: '
+
+        # Banned Champions
+        if "bannedChampions" in content:
+            for champion in content["bannedChampions"]:
+                results = results + CHAMPIONS[str(champion["championId"])] + ", "
+
+            results = results[:-2]
+
+        results = results + "\n\nTeam Blue\n"
+
+        # Add participant information
+        # Team blue
+        for participant in content["participants"][len(content["participants"])//2:]:
+            results = results + f'[{participant["summonerName"]}]   {CHAMPIONS[str(participant["championId"])]}\n'
+
+        results = results + "\nTeam Red\n"
+
+        # Add participant information
+        # Team red
+        for participant in content["participants"][:len(content["participants"])//2]:
+            results = results + f'participant: {participant["summonerName"]}\n'
+
         await ctx.send(results)
 
 
