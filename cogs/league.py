@@ -32,6 +32,7 @@ load_dotenv()
 LEAGUE_KEY = os.getenv('RIOT_KEY')
 
 CHAMPIONS = None
+QUEUE_TYPES = []
 
 
 class League(commands.Cog):
@@ -135,16 +136,23 @@ class League(commands.Cog):
         if response.status_code != 200:
             print(_url)
             print(headers)
-            print("return code: " + response.status_code)
+            print("return code: " + str(response.status_code))
             await ctx.send(f'Couldn\'t get active game. Are you sure they\'re in a game?')
             return
 
         # General information
         content = json.loads(response.content.decode())
         results = f'Summoner {user}\'s game information:\n' \
-                  f'Game type: {content["gameMode"]}\n' \
                   f'Duration: {round((content["gameLength"] + 180)/60)} minutes,' \
                   f' {(content["gameLength"] + 180)%60} seconds\n'
+
+        # Decipher game modes:
+        for item in QUEUE_TYPES:
+            # print(content["gameQueueConfigId"])
+            # print(item["queueId"])
+            if content["gameQueueConfigId"] == item["queueId"]:
+                results = results + f'Game Type: {item["description"]}\n'
+                break
 
         # Banned Champions
         if "bannedChampions" in content:
@@ -171,7 +179,9 @@ class League(commands.Cog):
 
 def setup(client):
     client.add_cog(League(client))
-    global CHAMPIONS
-    with open('resources/champion.json') as f:
+    global CHAMPIONS, QUEUE_TYPES
+    with open('resources/league/champion.json') as f:
         CHAMPIONS = json.load(f)
+    with open('resources/league/queueTypes.json') as f:
+        QUEUE_TYPES = json.load(f)
 

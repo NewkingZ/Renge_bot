@@ -4,7 +4,7 @@ import random
 
 
 def check_is_newking(ctx):
-    return ctx.author.id != 222789991036747787
+    return ctx.author.id == 222789991036747787
 
 
 class Games(commands.Cog):
