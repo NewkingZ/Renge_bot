@@ -26,7 +26,7 @@ async def ready():
     print(f'{client.user} has connected to Discord!')
     for guild in client.guilds:
         print("Guild name is: " + guild.name + " with an id of: " + str(guild.id))
-    #change_status.start()
+    # change_status.start()
 
 
 # Event triggered when members join a discord server (guild)

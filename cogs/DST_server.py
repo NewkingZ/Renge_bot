@@ -1,24 +1,19 @@
-from discord.ext import commands
-import subprocess
+# Don't starve together library for server handling
+
+import os
+import signal
 import asyncio
+import subprocess
+from dotenv import load_dotenv
+from discord.ext import commands
 
 # Things that are needed:
 # Path to starting the server
 # Bash file to start the script
 
-DST_STATUS = False
-
-
-async def startDST():
-    proc = await asyncio.create_subprocess_shell('tasklist',
-                                                 stdout=asyncio.subprocess.PIPE,
-                                                 stderr=asyncio.subprocess.PIPE)
-    stdout, stderr = await proc.communicate()
-    print(f'[command exited with {proc.returncode}]')
-    if stdout:
-        print(f'[stdout]\n{stdout.decode()}')
-    if stderr:
-        print(f'[stderr]\n{stderr.decode()}')
+load_dotenv()
+DST_SERVER_DIR = os.getenv("DST_SERVER_EXE")
+DST_SERVER = None
 
 
 class DST(commands.Cog):
@@ -34,14 +29,42 @@ class DST(commands.Cog):
     @commands.command()
     async def dstStart(self, ctx):
         # Start the server
-        await ctx.send("Still needs to be implemented")
-        await startDST()
+        global DST_SERVER
+
+        if DST_SERVER is not None:
+            await ctx.send("Renge's Backyard is already running")
+            return
+
+        f = open("./logs/DST.txt", "w+")
+        current_path = os.getcwd()
+        os.chdir("/".join(DST_SERVER_DIR.split("/")[:-1]))
+        DST_SERVER = subprocess.Popen([DST_SERVER_DIR.split("/")[-1], "-conf_dir", "myDSTserver"], stdout=f)
+        os.chdir(current_path)
+        await ctx.send("Server has started, it might take a couple of minutes for you to see it.\n"
+                       "Look for my backyard!")
 
     @commands.command()
     async def dstStop(self, ctx):
         # Stop the server
-        await ctx.send("Still needs to be implemented")
+        global DST_SERVER
+        if DST_SERVER is not None:
+            DST_SERVER.kill()
+            await ctx.send("Server has been killed")
+            DST_SERVER = None
+        else:
+            await ctx.send("Server isn't running currently")
+
+    @commands.command()
+    async def dstPW(self, ctx):
+        await ctx.send("Password for the server: " + os.getenv("DST_SERVER_PASSWORD"))
+
+    @commands.command()
+    async def dstStatus(self, ctx):
+        if DST_SERVER is None:
+            await ctx.send("Server is down, use dstStart to get it going!")
+        else:
+            await ctx.send("Server is running right now!")
+
 
 def setup(client):
     client.add_cog(DST(client))
-

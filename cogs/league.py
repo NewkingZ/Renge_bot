@@ -82,7 +82,7 @@ class League(commands.Cog):
         content = json.loads(response.content.decode())
         results = f'Summoner {user}\'s most played are:\n'
 
-        for i in range(5):
+        for i in range(10):
             results = results + f'\t{CHAMPIONS[str(content[i]["championId"])]} ' \
                                 f'with {content[i]["championPoints"]:,} pts. level {content[i]["championLevel"]}\n'
         await ctx.send(results)
