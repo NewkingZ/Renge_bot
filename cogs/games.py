@@ -3,10 +3,6 @@ from discord.ext import commands
 import random
 
 
-def check_is_newking(ctx):
-    return ctx.author.id == 222789991036747787
-
-
 class Games(commands.Cog):
 
     def __init__(self, client):
@@ -40,11 +36,6 @@ class Games(commands.Cog):
                      "Outlook not so good",
                      "Very Doubtful"]
         await ctx.send(f'Question: {question}\nAnswer: {random.choice(responses)}')
-
-    @commands.command()
-    @commands.check(check_is_newking)
-    async def nyanpasu(self, ctx):
-        await ctx.send('Nyanpasu!')
 
 
 def setup(client):

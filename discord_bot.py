@@ -38,6 +38,11 @@ async def on_member_join(member):
     # await member.dm_channel.send("Word is on the street that you like to go by 'last place larry'")
 
 
+@client.command()
+async def Nyanpasu(ctx):
+    await ctx.send("Nyanpasu!", file=discord.File("./resources/pictures/morning.png"))
+
+
 # @client.event
 # async def on_command_error(ctx, error):
 #     if isinstance(error, commands.MissingRequiredArgument):
