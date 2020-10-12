@@ -46,12 +46,8 @@ class DST(commands.Cog):
         # Stop the server
         global DST_SERVER
         if DST_SERVER is not None:
-            try:
-                # DST_SERVER.communicate(input=bytearray('c_shutdown()', "utf-8"), timeout=0.1)
-                DST_SERVER.stdin.write(bytearray('c_shutdown()\n', "utf-8"))
-                DST_SERVER.stdin.flush()
-            except subprocess.TimeoutExpired:
-                pass
+            DST_SERVER.stdin.write(bytearray('c_shutdown()\n', "utf-8"))
+            DST_SERVER.stdin.flush()
             await ctx.send("Server has been killed")
             DST_SERVER = None
         else:
@@ -79,12 +75,8 @@ class DST(commands.Cog):
         else:
             print("DST Server was restarted by: " + ctx.author.name)
             print("Reason was: " + reason)
-            try:
-                DST_SERVER.stdin.write(bytearray('c_regenerateworld()\n', "utf-8"))
-                DST_SERVER.stdin.flush()
-                # DST_SERVER.communicate(input=bytearray('c_regenerateworld()', "utf-8"), timeout=0.1)
-            except subprocess.TimeoutExpired:
-                pass
+            DST_SERVER.stdin.write(bytearray('c_regenerateworld()\n', "utf-8"))
+            DST_SERVER.stdin.flush()
             await ctx.send("Restarting the server")
 
     @dstReset.error
@@ -92,6 +84,15 @@ class DST(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send("Please give a reason to restart the server when using the command")
 
+    @commands.command()
+    async def dstSave(self, ctx):
+        if DST_SERVER is None:
+            await ctx.send("Server is currently down. It's gotta be running for it to be saved")
+        else:
+            DST_SERVER.stdin.write(bytearray('c_save()\n', "utf-8"))
+            DST_SERVER.stdin.flush()
+            await ctx.send("Saved the server state (auto-save is done at the end of every night)")
+            
 
 def setup(client):
     client.add_cog(DST(client))

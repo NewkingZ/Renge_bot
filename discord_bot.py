@@ -16,6 +16,7 @@ PREFIX = os.getenv('DISCORD_PREFIX')
 # Set up work environment
 logging.basicConfig(level=logging.INFO)
 client = commands.Bot(command_prefix=PREFIX)
+# client.remove_command('help')
 
 status = cycle(['Nyanpasu!', 'Killin it'])
 
