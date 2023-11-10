@@ -20,7 +20,7 @@ client = commands.Bot(command_prefix=PREFIX, intents=intents)
 # client.remove_command('help')
 
 # Cog whitelist
-COG_WHITELIST = ['games', 'league', 'tasks']
+COG_WHITELIST = ['tasks']
 
 
 @client.event
@@ -29,13 +29,12 @@ async def on_ready():
     await client.change_presence(status=discord.Status.online, activity=discord.Game('Nyanpasu!'))
     print(f'{client.user} has connected to Discord!')
     for guild in client.guilds:
-        print("Guild name is: " + guild.name + " with an id of: " + str(guild.id))
+        print("Connected guilds are: " + guild.name + " with an id of: " + str(guild.id))
 
     # Load cogs and then start the client
-    # for filename in os.listdir("./cogs"):
-    #     if filename.endswith(".py") and filename[:-len(".py")] in COG_WHITELIST:
-    #         await client.load_extension(f'cogs.{filename[:-3]}')
-    # change_status.start()
+    for filename in os.listdir("./cogs"):
+        if filename.endswith(".py") and filename[:-len(".py")] in COG_WHITELIST:
+            await client.load_extension(f'cogs.{filename[:-3]}')
 
 
 # Event triggered when members join a discord server (guild)
@@ -63,6 +62,7 @@ async def on_command_error(ctx, error):
         print("Unhandled error")
         print("Message: " + ctx.message.content)
         print("Author: " + ctx.message.author.name)
+        print(f"Traceback: {error}")
 
 
 # ##################### Client Commands ##################################
@@ -75,7 +75,5 @@ async def load(ctx, extension):
 async def unload(ctx, extension):
     await client.unload_extension(f'cogs.{extension}')
 
-
-# client.loop.create_task(ready())
 
 client.run(TOKEN)

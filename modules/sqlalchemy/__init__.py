@@ -7,7 +7,7 @@ load_dotenv()
 DB_USER = os.getenv('DATABASE_USER')
 DB_PW = os.getenv('DATABASE_PW')
 DB_SERVER = os.getenv('DATABASE_SERVER')
-DB_DATABASE = os.getenv('DATABASE_DATABASE')
+DB_DATABASE = os.getenv('DATABASE_DB')
 DB_PORT = os.getenv('DATABASE_PORT')
 
 credentials = {"Username": DB_USER,

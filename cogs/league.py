@@ -177,8 +177,8 @@ class League(commands.Cog):
         await ctx.send(results)
 
 
-def setup(client):
-    client.add_cog(League(client))
+async def setup(client):
+    await client.add_cog(League(client))
     global CHAMPIONS, QUEUE_TYPES
     with open('resources/league/champion.json') as f:
         CHAMPIONS = json.load(f)

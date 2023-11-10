@@ -14,6 +14,6 @@ class Levels(commands.Cog):
         # Needs to be implemented
 
 
-def setup(client):
-    client.add_cog(Levels(client))
+async def setup(client):
+    await client.add_cog(Levels(client))
 

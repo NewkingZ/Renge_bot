@@ -12,9 +12,14 @@ def connect_db(credentials):
 	global db_engine
 	if db_engine is not None:
 		return
+	if credentials['Server'] is None:
+		credentials['Server'] = "localhost"
+	if credentials['Port'] is None:
+		credentials['Port'] = 5432
 
 	db_string = f"postgresql+psycopg2://{credentials['Username']}:{credentials['Password']}@{credentials['Server']}" \
 				f":{credentials['Port']}/{credentials['Database']}"
+
 	db_engine = create_engine(db_string)
 
 	try:
