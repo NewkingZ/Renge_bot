@@ -44,11 +44,14 @@ def db_query(stmt):
 def db_commit(stmt):
 	try:
 		if db_engine is None:
+			print("Invalid database engine")
 			return None
 		with Session_alc(db_engine) as session:
 			result = session.execute(stmt)
 			session.commit()
 		return result
 	# Error occurred (content probably already exists)
-	except IntegrityError:
+	except IntegrityError as e:
+		session.rollback()
+		print(f"Integrity error: {e.orig.diag.message_detail}")
 		return None

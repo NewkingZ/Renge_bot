@@ -28,8 +28,6 @@ async def on_ready():
     await client.wait_until_ready()
     await client.change_presence(status=discord.Status.online, activity=discord.Game('Nyanpasu!'))
     print(f'{client.user} has connected to Discord!')
-    for guild in client.guilds:
-        print("Connected guilds are: " + guild.name + " with an id of: " + str(guild.id))
 
     # Load cogs and then start the client
     for filename in os.listdir("./cogs"):
@@ -50,6 +48,8 @@ async def nyanpasu(ctx):
     await ctx.send("Nyanpasu!", file=discord.File("./resources/pictures/morning.png"))
 
 
+# Favor COG specific handling of errors for now
+'''
 @client.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
@@ -63,6 +63,7 @@ async def on_command_error(ctx, error):
         print("Message: " + ctx.message.content)
         print("Author: " + ctx.message.author.name)
         print(f"Traceback: {error}")
+'''
 
 
 # ##################### Client Commands ##################################
