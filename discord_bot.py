@@ -20,7 +20,7 @@ client = commands.Bot(command_prefix=PREFIX, intents=intents)
 # client.remove_command('help')
 
 # Cog whitelist
-COG_WHITELIST = ['tasks']
+COG_WHITELIST = ['router']
 
 
 @client.event
